@@ -161,8 +161,9 @@ MatrixXd SCManager::makeScancontext( pcl::PointCloud<SCPointType> & _scan_down )
     SCPointType pt;
     float azim_angle, azim_range; // wihtin 2d plane
     int ring_idx, sctor_idx;
+    printf("num_pts_scan_down %d \n",num_pts_scan_down);
     for (int pt_idx = 0; pt_idx < num_pts_scan_down; pt_idx++)
-    {
+    {   
         pt.x = _scan_down.points[pt_idx].x; 
         pt.y = _scan_down.points[pt_idx].y;
         pt.z = _scan_down.points[pt_idx].z + LIDAR_HEIGHT; // naive adding is ok (all points should be > 0).
@@ -402,8 +403,15 @@ std::pair<int, float> SCManager::detectLoopClosureID ( void )
 
     /* 
      * loop threshold check
+     [Loop found] Nearest distance: 0.00826 btn 1805 and 400.
+Loop detected! - between 400 and 1805
+num_pts_scan_down 1510 
+running isam2 optimization ...
+[SC loop] ICP fitness test passed (0.0139 < 0.3). Add this SC loop.
+num_pts_scan_down 1512 
+
      */
-    if( min_dist < SC_DIST_THRES )
+    if( min_dist < SC_DIST_THRES ) 
     {
         loop_id = nn_idx; 
     

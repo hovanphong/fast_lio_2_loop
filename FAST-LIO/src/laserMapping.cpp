@@ -302,6 +302,15 @@ void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg)
     mtx_buffer.lock();
     double preprocess_start_time = omp_get_wtime();
     scan_count ++;
+    // --- ĐOẠN SỬA ĐỔI BẮT ĐẦU TẠI ĐÂY ---
+    if (msg->header.stamp.toSec() < last_timestamp_lidar)
+    {
+        ROS_ERROR("Lidar loop back detected! Resetting all sync flags and buffers...");
+        lidar_buffer.clear();
+        imu_buffer.clear();        // Xóa luôn buffer IMU vì timestamp IMU cũng sẽ nhảy ngược
+        timediff_set_flg = false;  // QUAN TRỌNG: Reset cờ để tính lại độ lệch thời gian cho vòng mới
+        scan_count = 0;            // Reset bộ đếm scan
+    }
     if (msg->header.stamp.toSec() < last_timestamp_lidar)
     {
         ROS_ERROR("lidar loop back, clear buffer");
@@ -726,7 +735,8 @@ int main(int argc, char** argv)
     nh.param<int>("max_iteration",NUM_MAX_ITERATIONS,4);
     nh.param<string>("map_file_path",map_file_path,"");
     nh.param<string>("common/lid_topic",lid_topic,"/livox/lidar");
-    nh.param<string>("common/imu_topic", imu_topic,"/livox/imu");
+    // nh.param<string>("common/imu_topic", imu_topic,"/vn100/imu");
+    nh.param<string>("common/imu_topic", imu_topic,"/vn200/imu");
     nh.param<bool>("common/time_sync_en", time_sync_en, false);
     nh.param<double>("filter_size_corner",filter_size_corner_min,0.5);
     nh.param<double>("filter_size_surf",filter_size_surf_min,0.5);
